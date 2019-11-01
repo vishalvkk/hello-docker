@@ -1,4 +1,6 @@
-FROM nginx:1.17.4
+FROM nginx
+
+MAINTAINER "hari.karthigasu@gmail.com"
 
 RUN echo "Building hello docker..."
 
