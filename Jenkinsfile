@@ -27,32 +27,32 @@ pipeline {
             }
         }
 
-        stage("publish") {
-            steps {
-                container(name: 'kaniko', shell: '/busybox/sh') {
-                     withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
-                      sh """#!/busybox/sh
-                        /kaniko/executor --context=$WORKSPACE --destination $registry:$tag
-                      """
-                     }
-                }
-            }
-        }
+        // stage("publish") {
+        //     steps {
+        //         container(name: 'kaniko', shell: '/busybox/sh') {
+        //              withEnv(['PATH+EXTRA=/busybox:/kaniko']) {
+        //               sh """#!/busybox/sh
+        //                 /kaniko/executor --context=$WORKSPACE --destination $registry:$tag
+        //               """
+        //              }
+        //         }
+        //     }
+        // }
 
-        stage("scan") {
-            steps {
-                container("klar") {
-                    sh  """
-                            CLAIR_ADDR=$CLAIR_ADDRESS \
-                            CLAIR_OUTPUT=High \
-                            CLAIR_THRESHOLD=1 \
-                            DOCKER_USER=$DOCKER_CREDENTIALS_USR \
-                            DOCKER_PASSWORD=$DOCKER_CREDENTIALS_PSW \
-                            DOCKER_INSECURE=true \
-                            klar $registry:$tag
-                        """
-                }
-            }
-        }
+        // stage("scan") {
+        //     steps {
+        //         container("klar") {
+        //             sh  """
+        //                     CLAIR_ADDR=$CLAIR_ADDRESS \
+        //                     CLAIR_OUTPUT=High \
+        //                     CLAIR_THRESHOLD=1 \
+        //                     DOCKER_USER=$DOCKER_CREDENTIALS_USR \
+        //                     DOCKER_PASSWORD=$DOCKER_CREDENTIALS_PSW \
+        //                     DOCKER_INSECURE=true \
+        //                     klar $registry:$tag
+        //                 """
+        //         }
+        //     }
+        // }
     }
 }
