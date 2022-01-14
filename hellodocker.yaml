@@ -1,15 +1,75 @@
-apiVersion: v1
-kind: Pod
+
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  creationTimestamp: null
   labels:
-    run: hello-docker
-  name: hello-docker
-  namespace: foo
+    app: documents-server
+  name: documents-server
+
 spec:
-  containers:
-  - image: harik8/hello-docker
-    name: hello-docker
-    resources: {}
-  dnsPolicy: ClusterFirst
-  restartPolicy: Never
-status: {}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: documents-server
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: documents-server
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - documents
+
+      containers:
+        - name: documents-with-docker
+          image: redis:latest
+
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: documents-server
+  name: documents-service
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+    targetPort: 6379
+    name: documents-port
+  - port: 53
+    protocol: TCP
+    name: dns-tcp
+  - port: 53
+    protocol: UDP
+    name: dns-udp
+  - port: 80
+    protocol: TCP
+    name: http
+  - port: 443
+    protocol: TCP
+    name: https
+  selector:
+    app: documents-server
+  type: ClusterIP
+status:
+  loadBalancer: {}
